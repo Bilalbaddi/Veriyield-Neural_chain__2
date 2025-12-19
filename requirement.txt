@@ -1,0 +1,14 @@
+streamlit
+pandas
+numpy
+requests
+python-dotenv
+groq
+fpdf
+qrcode
+Pillow
+langgraph
+langchain-groq
+langchain-community
+duckduckgo-search
+pydeck
