@@ -93,37 +93,58 @@ with st.sidebar:
 
 # --- LOGIN LAYER: ZK-IDENTITY ---
 # --- LOGIN LAYER: ZK-IDENTITY & AGRISTACK ---
+# --- LOGIN LAYER: ZK-IDENTITY & AGRISTACK ---
 if not st.session_state.logged_in:
-    st.markdown("<h1 style='text-align: center;'> VeriYield Protocol</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center;'>Decentralized Agricultural Risk & Commerce Layer</p>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: center; padding: 40px;'>", unsafe_allow_html=True)
+    st.markdown("<h1 style='font-size: 3rem;'>🔐 VeriYield Protocol</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 1.2rem; color: #666;'>Decentralized Agricultural Risk & Commerce Layer</p>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
-        st.info("Authenticating via Anon Aadhaar (ZK-Proof)...")
-        
-        # The Button
-        if st.button("Connect Identity (Zero-Knowledge)", type="primary", use_container_width=True):
-            with st.spinner("Generating Cryptographic Proof..."):
-                time.sleep(1.5) # Fake ZK generation delay
-                st.success("✅ Proof Verified: Resident of Maharashtra (Valid Aadhaar)")
-                time.sleep(0.5)
+        # 1. ZK-Identity Login Card
+        with st.container():
+            st.markdown("### 🆔 Connect Identity")
+            st.info("Authenticating via Anon Aadhaar (ZK-Proof)...")
+            
+            # Consent Checkbox (DEPA Compliance)
+            consent = st.checkbox("I authorize VeriYield to fetch my Land Records from AgriStack (UFSI).", value=True)
+            
+            if st.button("Connect Identity (Zero-Knowledge)", type="primary", use_container_width=True, disabled=not consent):
                 
-                # --- NEW: AGRISTACK LAND FETCH (The Missing Feature) ---
-                with st.status("Fetching AgriStack Land Records...", expanded=True):
+                # STEP 1: ZK PROOF GENERATION
+                with st.spinner("Generating Cryptographic Proof (ZK-SNARK)..."):
+                    time.sleep(1.5) # Simulate heavy computation
+                    st.success("✅ Proof Verified: Resident of Maharashtra (Valid Aadhaar)")
+                    time.sleep(0.5)
+                
+                # STEP 2: AGRISTACK SIMULATION (The New Feature)
+                # This simulates calling the UFSI API mentioned in your research
+                with st.status("🚜 Accessing AgriStack Farmland Registry...", expanded=True) as status:
+                    st.write("📡 Connecting to UFSI Gateway...")
                     time.sleep(0.8)
-                    st.write(" Locating Survey No. 24/A (Nashik)...")
+                    
+                    st.write("🔍 Querying Farmer ID: `F-2025-MH-12345`")
+                    time.sleep(0.8)
+                    
+                    st.write("📍 Found Land Parcel: **Survey No. 45/2A (Nashik)**")
+                    time.sleep(0.8)
+                    
+                    st.write("📐 Verifying Geo-Polygon Geometry...")
                     time.sleep(0.5)
-                    st.write(" Verifying Land Polygon Geometry...")
-                    time.sleep(0.5)
-                    st.write(" Linking Identity to Farmland Registry...")
-                    time.sleep(0.5)
+                    
+                    status.update(label="✅ Digital Twin Linked Successfully!", state="complete", expanded=False)
                 
-                # Save Mock Land Data for the Map later
-                st.session_state.land_coords = {
-                    'lat': [19.9975], 
-                    'lon': [73.7898]
+                # SAVE MOCK DATA TO SESSION FOR MAPS LATER
+                st.session_state.land_data = {
+                    "survey_no": "45/2A",
+                    "area": "2.5 Hectares",
+                    "lat": 19.9975,
+                    "lon": 73.7898,
+                    "district": "Nashik"
                 }
                 
+                time.sleep(1)
                 st.session_state.logged_in = True
                 st.rerun()
 
@@ -369,59 +390,121 @@ else:
                 st.caption("System monitoring for >50mm Rainfall.")
     # --- TAB 4: MARKET NEGOTIATOR ---
    # --- TAB 4: MARKET NEGOTIATOR (The "Raju Bhai" Agent) ---
+   # --- TAB 4: MARKET & ONDC COMMERCE ---
     with tab4:
-        st.subheader("🤝 e-NAM Smart-Mandi (Live)")
+        st.subheader("🤝 e-NAM & ONDC Smart-Mandi")
+        st.caption("Decentralized Commerce: Negotiate locally or connect with National Buyers.")
+
+        # Import the Agents
+        from utils.market_agent import broker_agent
+        from utils.ondc import broadcast_to_ondc, generate_invoice
         
         if not st.session_state.crop_data:
-            st.warning("⚠️ Please analyze a crop in Tab 1 first.")
+            st.warning("⚠️ Please analyze a crop in Tab 1 first to establish quality.")
         else:
-            c1, c2 = st.columns([1, 4])
-            with c1: st.image("https://cdn-icons-png.flaticon.com/512/4529/4529995.png", width=80)
-            with c2: 
-                st.markdown(f"**Agent:** {broker_agent.name} (Senior Broker)")
-                st.caption("📍 Location: Nashik Mandi | 🟢 Status: Online")
+            # Layout: Left = Chat (Raju Bhai), Right = ONDC Network
+            col_chat, col_ondc = st.columns([1, 1.2])
             
-            st.divider()
-            chat_container = st.container(height=400)
-            
-            # Display History
-            with chat_container:
-                if not st.session_state.chat_history:
-                    crop = st.session_state.crop_data.get('crop_type', 'Crop')
-                    greeting = f"Ram Ram Sir ji! I see you have some {crop}. Market is busy today. What is your expected rate (Bhaav)?"
-                    st.session_state.chat_history.append({"role": "assistant", "content": greeting})
+            # --- LEFT COLUMN: RAJU BHAI (Negotiation Agent) ---
+            with col_chat:
+                st.markdown("### 🤖 Local Mandi Agent")
                 
-                for msg in st.session_state.chat_history:
-                    avatar = "👳" if msg['role'] == "assistant" else "👨‍🌾"
-                    st.chat_message(msg['role'], avatar=avatar).write(msg["content"])
+                # Chat Container
+                chat_container = st.container(height=400)
+                
+                # Display History
+                with chat_container:
+                    if not st.session_state.chat_history:
+                        crop = st.session_state.crop_data.get('crop_type', 'Crop')
+                        grade = st.session_state.crop_data.get('fci_grade', 'Standard')
+                        greeting = f"Ram Ram Sir ji! I see you have some {crop} ({grade}). Market is busy today. What is your expected rate (Bhaav)?"
+                        st.session_state.chat_history.append({"role": "assistant", "content": greeting})
+                    
+                    for msg in st.session_state.chat_history:
+                        avatar = "👳" if msg['role'] == "assistant" else "👨‍🌾"
+                        st.chat_message(msg['role'], avatar=avatar).write(msg["content"])
 
-            # Chips
-            st.markdown("### 🗣️ Quick Actions")
-            cols = st.columns(4)
-            if cols[0].button("📈 Market Trend?"): st.session_state.user_input = "What is the market trend?"
-            if cols[1].button("🚚 Arrivals?"): st.session_state.user_input = "How many trucks arrived today?"
-            if cols[2].button("💰 Best Price?"): st.session_state.user_input = "Give me your best final rate."
-            if cols[3].button("🛑 Should I hold?"): st.session_state.user_input = "Should I sell now or wait?"
+                # Quick Chips
+                st.markdown("###### 🗣️ Quick Ask")
+                cols = st.columns(3)
+                if cols[0].button("Trend?"): st.session_state.user_input = "What is the market trend?"
+                if cols[1].button("Best Price?"): st.session_state.user_input = "Give me your best final rate."
+                if cols[2].button("Hold?"): st.session_state.user_input = "Should I sell now or wait?"
 
-            # Input
-            prompt = st.chat_input("Message Raju Bhai...")
-            if prompt: st.session_state.user_input = prompt
+                # Chat Input
+                prompt = st.chat_input("Message Raju Bhai...")
+                if prompt: st.session_state.user_input = prompt
 
-            if st.session_state.user_input:
-                user_msg = st.session_state.user_input
-                st.session_state.user_input = "" # Clear input
+                # Chat Logic
+                if st.session_state.user_input:
+                    user_msg = st.session_state.user_input
+                    st.session_state.user_input = "" 
+                    
+                    st.session_state.chat_history.append({"role": "user", "content": user_msg})
+                    with chat_container: st.chat_message("user", avatar="👨‍🌾").write(user_msg)
+                    
+                    with st.spinner(f"{broker_agent.name} is checking rates..."):
+                        response = broker_agent.chat_with_broker(st.session_state.chat_history, st.session_state.crop_data, user_msg)
+                    
+                    st.session_state.chat_history.append({"role": "assistant", "content": response})
+                    with chat_container: st.chat_message("assistant", avatar="👳").write(response)
+                    st.rerun()
+
+            # --- RIGHT COLUMN: ONDC NETWORK (The "Real World" Feature) ---
+            with col_ondc:
+                st.markdown("### 🌐 ONDC National Grid")
                 
-                # Show User Message
-                st.session_state.chat_history.append({"role": "user", "content": user_msg})
-                with chat_container: st.chat_message("user", avatar="👨‍🌾").write(user_msg)
-                
-                # Show AI Response
-                with st.spinner(f"{broker_agent.name} is checking rates..."):
-                    response = broker_agent.chat_with_broker(st.session_state.chat_history, st.session_state.crop_data, user_msg)
-                
-                st.session_state.chat_history.append({"role": "assistant", "content": response})
-                with chat_container: st.chat_message("assistant", avatar="👳").write(response)
-                st.rerun()
+                with st.container():
+                    # Listing Card
+                    st.markdown(f"""
+                    <div style="background: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid #e0e0e0; margin-bottom: 15px;">
+                        <h4 style="margin:0; color: #2E7D32;">📦 Active Listing: {st.session_state.crop_data.get('crop_type')}</h4>
+                        <p style="margin:0; font-size: 0.9rem;">Grade: <b>{st.session_state.crop_data.get('fci_grade')}</b> | Verified by Vision AI</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    qty = st.slider("Quantity to Sell (kg)", 100, 5000, 500)
+                    
+                    st.info("💡 **Pro Tip:** Use the 'Broadcast' button below to find REAL market rates via the ONDC Gateway.")
+                    
+                    # THE "REAL WORLD" MOMENT
+                    if st.button("📡 Broadcast to ONDC Network", type="primary", use_container_width=True):
+                        with st.status("🔄 Handshaking with ONDC Gateway...", expanded=True):
+                            st.write("🔍 Searching for active Buyer Apps...")
+                            time.sleep(1)
+                            st.write("📡 Pinging BigBasket, Blinkit, Ninjacart...")
+                            time.sleep(1)
+                            
+                            # CALL THE NEW RAG-POWERED FUNCTION
+                            st.session_state.bids = broadcast_to_ondc(st.session_state.crop_data)
+                            
+                            st.write(f"✅ {len(st.session_state.bids)} Competitive Bids Received!")
+                    
+                    # Display Bids
+                    if 'bids' in st.session_state:
+                        st.markdown("#### ⚡ Live Bids (Expires in 5:00)")
+                        
+                        for bid in st.session_state.bids:
+                            with st.container():
+                                # Custom Card Layout for Bid
+                                c1, c2, c3 = st.columns([0.8, 2, 1.2])
+                                with c1: st.markdown(f"## {bid['logo']}")
+                                with c2: 
+                                    st.write(f"**{bid['buyer_app']}**")
+                                    st.caption(f"⭐ {bid['rating']} • {bid['distance']}")
+                                with c3:
+                                    st.metric("Offer", f"₹{bid['price']}/kg")
+                                    if st.button(f"Accept", key=bid['buyer_app']):
+                                        inv = generate_invoice(bid, st.session_state.crop_data, qty)
+                                        st.session_state.invoice = inv
+                                        st.rerun()
+                        
+                        # Show Invoice if Deal Accepted
+                        if 'invoice' in st.session_state:
+                            st.divider()
+                            st.success(f"🎉 Deal Confirmed with {st.session_state.invoice['buyer']}!")
+                            st.json(st.session_state.invoice)
+                            st.balloons()
     # --- TAB 5: SUSTAINABILITY ---
     # --- TAB 5: SUSTAINABILITY (Fixed Logic) ---
     # --- TAB 5: SUSTAINABILITY (With AI "Proof of Green") ---
