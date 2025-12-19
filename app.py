@@ -500,11 +500,46 @@ else:
                                         st.rerun()
                         
                         # Show Invoice if Deal Accepted
+                        # ... (Previous code for displaying bids) ...
+                        
+                        # Show Invoice if Deal Accepted
                         if 'invoice' in st.session_state:
                             st.divider()
-                            st.success(f"🎉 Deal Confirmed with {st.session_state.invoice['buyer']}!")
-                            st.json(st.session_state.invoice)
+                            inv = st.session_state.invoice
+                            
+                            # 1. VISUAL RECEIPT CARD
+                            st.markdown(f"""
+                            <div style="background-color: #F0FDF4; border: 1px solid #22C55E; border-radius: 10px; padding: 20px; text-align: center;">
+                                <h2 style="color: #15803D; margin:0;">🎉 Deal Confirmed!</h2>
+                                <p style="color: #166534;">Smart Contract Locked on ONDC Network</p>
+                                <hr style="border-top: 1px dashed #22C55E; margin: 15px 0;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <strong>Buyer:</strong> <span>{inv['buyer']}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <strong>Quantity:</strong> <span>{inv['quantity']}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <strong>Total Payout:</strong> <span style="font-size: 1.2rem; font-weight: bold; color: #15803D;">{inv['total_amount']}</span>
+                                </div>
+                                <div style="font-family: monospace; background: #e6e6e6; padding: 5px; border-radius: 5px; font-size: 0.8rem; margin-top: 10px;">
+                                    Contract Hash: {inv['invoice_id']}
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
                             st.balloons()
+                            
+                            # 2. DOWNLOAD ACTION
+                            # Convert JSON to String for download
+                            json_str = json.dumps(inv, indent=4)
+                            st.download_button(
+                                label="⬇️ Download Digital Contract (JSON)",
+                                data=json_str,
+                                file_name=f"veriyield_invoice_{inv['invoice_id']}.json",
+                                mime="application/json",
+                                type="primary"
+                            )
     # --- TAB 5: SUSTAINABILITY ---
     # --- TAB 5: SUSTAINABILITY (Fixed Logic) ---
     # --- TAB 5: SUSTAINABILITY (With AI "Proof of Green") ---
