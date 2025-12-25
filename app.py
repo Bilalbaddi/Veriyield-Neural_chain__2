@@ -161,63 +161,105 @@ else:
         "Sustainability"
     ])
 
-    # --- TAB 1: VISION & FCI GRADING ---
+    # --- TAB 1: VERIYIELD TRUSTMESH (IoT Verification) ---
+   # --- TAB 1: VERIYIELD TRUSTMESH (IoT Verification) ---
     with tab1:
-        st.subheader("FCI-Standard Quality Assayer")
-        col_img, col_metrics = st.columns([1, 1])
+        st.subheader("🛡️ VeriYield TrustMesh: Sensor-Backed Verification")
+        st.caption("Replacing subjective photos with objective, immutable sensor data.")
         
-        with col_img:
-            img = st.file_uploader("Upload Crop Image", type=['jpg', 'png', 'jpeg'])
-            if img:
-                st.image(img, caption="Field Capture", use_column_width=True)
+        # Import the Oracle
+        from utils.trustmesh import mesh_agent
         
-        with col_metrics:
-            if img and st.button("Analyze Quality", type="primary"):
-                with st.spinner("Running Llama-Vision Assayer..."):
-                    result = analyze_crop_disease(img)
-                    st.session_state.crop_data = result
-                    st.session_state.last_analysis = result # For Tab 2 compatibility
+        col_input, col_status = st.columns([1, 2])
+        
+        with col_input:
+            st.markdown("### 📡 Farm Node Connection")
+            st.info("Simulating connection to Field IoT Nodes...")
+            
+            farm_id = st.text_input("Enter Farm ID / Batch No", value="FARM-MH-NK-24A")
+            crop_type = st.selectbox("Select Crop Profile", ["Tomato", "Wheat", "Grapes"])
+            
+            if st.button("🔄 Sync Field Data", type="primary"):
+                with st.spinner("Handshaking with IoT Sensors (LoRaWAN)..."):
+                    time.sleep(1.5)
+                    # FETCH MOCK DATA
+                    history_df, score = mesh_agent.fetch_sensor_history(farm_id, crop_type)
                     
-                    # Display Results
-                    st.markdown(f"### Grade: {result.get('fci_grade', 'N/A')}")
-                    
-                    m1, m2 = st.columns(2)
-                    m1.metric("Est. Size", result.get('estimated_size_mm', 'N/A'))
-                    m2.metric("Confidence", result.get('confidence', 'N/A'))
-                    
-                    st.write("**Visual Defects:**")
-                    st.write(", ".join(result.get('visual_defects', ['None'])))
-                    
-                    st.info(f"**Explanation:** {result.get('explanation', 'Analysis complete.')}")
-                    st.divider()
-                    st.subheader("🧠 Multi-Modal Research Agent")
-                    
-                    with st.status("🕵️ Agent is searching the web...", expanded=True) as status:
-                        st.write(f"🔍 Searching: '{result.get('search_term', 'Crop disease treatment')}'")
-                        st.write("🌐 Browsing: agmarknet.gov.in, amazon.in, krishijagran.com...")
-                        
-                        # CALL THE LANGGRAPH AGENT
-                        advisory = agent_chain.generate_detailed_advisory(
-                            disease_data=result,
-                            weather_context="Live", # Agent fetches this automatically now
-                            market_context="Live"
-                        )
-                        status.update(label="✅ Research Complete!", state="complete", expanded=False)
-                    
-                    # Display the Agent's Report
-                    st.markdown(advisory)
-                    
-                    if result.get('fci_grade') == 'Grade A':
-                        st.balloons()
-                        pdf_file = generate_quality_pdf(result)
-                        with open(pdf_file, "rb") as f:
-                            st.download_button(
-                                label="📄 Download FCI Quality Certificate",
-                                data=f,
-                                file_name="VeriYield_Certificate.pdf",
-                                mime="application/pdf"
-                            )
+                    # Store in Session State
+                    st.session_state.sensor_history = history_df
+                    st.session_state.trust_score = score
+                    # Create the certificate immediately but don't show it yet
+                    st.session_state.certificate = mesh_agent.mint_digital_identity(farm_id, crop_type, score)
+                    st.session_state.crop_data = {
+                        "crop_type": crop_type,
+                        "fci_grade": "Grade A" if score > 85 else "Grade B",
+                        "confidence": f"{score}%" 
+                    }
+                    # Reset scan state on new sync
+                    st.session_state.qr_scanned = False
+                    st.success("✅ Data Stream Verified & Locked")
 
+        with col_status:
+            if 'sensor_history' in st.session_state:
+                df = st.session_state.sensor_history
+                score = st.session_state.trust_score
+                
+                # 1. THE SCORECARD
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Trust Score", f"{score}/100", delta="Excellent" if score > 80 else "Average")
+                c2.metric("Soil Moisture (Avg)", f"{df['soil_moisture'].mean():.1f}%")
+                c3.metric("Stress Events", f"{len(df[df['stress_detected']==True])} Days", delta_color="inverse")
+                
+                st.divider()
+                
+                # 2. THE CHART
+                st.markdown("##### 📈 Growing Conditions (Last 90 Days)")
+                chart_data = df.set_index("date")[['soil_moisture', 'temperature']]
+                st.line_chart(chart_data, color=["#2E7D32", "#FF5722"], height=200)
+                
+                # 3. THE QR CODE (The only visible output initially)
+                st.markdown("### ⛓️ Immutable Quality Passport")
+                
+                bc1, bc2 = st.columns([1.5, 2.5])
+                with bc1:
+                    # Generate QR Code 
+                    import qrcode
+                    import io
+                    # The QR contains the hidden JSON string
+                    qr = qrcode.QRCode(box_size=8, border=2)
+                    qr.add_data(str(st.session_state.certificate))
+                    qr.make(fit=True)
+                    img_qr = qr.make_image(fill_color="black", back_color="white")
+                    
+                    # Convert for Streamlit
+                    img_byte_arr = io.BytesIO()
+                    img_qr.save(img_byte_arr, format='PNG')
+                    st.image(img_byte_arr.getvalue(), caption="Physical Crate Label", use_column_width=True)
+                
+                with bc2:
+                    st.info("👈 This QR code is physically attached to the crop crate.")
+                    st.write("Buyers scan this to verify the 'Invisible Quality' history.")
+                    
+                    st.write("") # Spacer
+                    
+                    # 4. THE SCAN INTERACTION (Reveals the Data)
+                    if st.button("📱 Simulate Buyer Scan", type="secondary", use_container_width=True):
+                        st.session_state.qr_scanned = True
+                    
+                    if st.session_state.get('qr_scanned', False):
+                        st.success("✅ Identity Verified on Blockchain!")
+                        
+                        # Show the hidden JSON now
+                        with st.expander("📄 View Verified Certificate Data", expanded=True):
+                            st.json(st.session_state.certificate)
+                            
+            else:
+                st.markdown("""
+                <div style="background: #ffffff; padding: 30px; border-radius: 10px; text-align: center; border: 1px dashed #ccc; color: #666;">
+                    <h3>Waiting for Data Stream...</h3>
+                    <p>Connect to a farm node to view the immutable growing history.</p>
+                </div>
+                """, unsafe_allow_html=True)
 
     # --- TAB 2: SUPPLY CHAIN (SIMULATED BLOCKCHAIN) ---
     # --- TAB 2: SUPPLY CHAIN (Enterprise Logistics Layer) ---
