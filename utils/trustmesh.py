@@ -4,6 +4,7 @@ import random
 import hashlib
 import json
 from datetime import datetime, timedelta
+from utils.shared_db import save_certificate
 
 class TrustMeshOracle:
     def __init__(self):
@@ -107,6 +108,10 @@ class TrustMeshOracle:
             "blockchain_hash": f"0x{hash_id}",
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
+        
+
+        # [NEW LINE] SAVE TO SHARED DB
+        save_certificate(certificate)
         return certificate
 
 # Singleton Instance

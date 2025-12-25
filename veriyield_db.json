@@ -16,5 +16,14 @@
             "tx": "0xc3e782f7c6e66db9fb5cba1c75a250afb49a3593135a2005014389cb5ada3bdf",
             "wallet": "0xUserWallet"
         }
+    },
+    {
+        "timestamp": "2025-12-25 17:01:07",
+        "type": "Insurance Payout",
+        "details": {
+            "amount": "1.0 ETH (100% Coverage)",
+            "tx": "0x88d09b1e88595c370c44cf8da786c558d45719aaba5fd1e998cfc913a39a51c0",
+            "wallet": "0xUserWallet"
+        }
     }
 ]

@@ -1,0 +1,134 @@
+[
+    {
+        "certificate_id": "VY-20679149",
+        "farm_node_id": "FARM-MH-NK-24A",
+        "current_harvest": {
+            "crop": "Tomato",
+            "trust_score": 60,
+            "verification_method": "IoT_SENSOR_CONSENSUS",
+            "grade": "Grade B"
+        },
+        "farmer_reputation": {
+            "total_harvests_verified": 4,
+            "average_score": 81,
+            "score_history": [
+                {
+                    "date": "2024-06-15",
+                    "crop": "Wheat",
+                    "score": 85
+                },
+                {
+                    "date": "2024-02-20",
+                    "crop": "Onion",
+                    "score": 88
+                },
+                {
+                    "date": "2023-11-10",
+                    "crop": "Tomato",
+                    "score": 93
+                }
+            ]
+        },
+        "blockchain_hash": "0x20679149cbdd207adb309892f0fadf8d4c1afa0f4aee8658ec870b71c911dbc5",
+        "timestamp": "2025-12-25 16:34:49"
+    },
+    {
+        "certificate_id": "VY-97AD1F72",
+        "farm_node_id": "FARM-MH-NK-24A",
+        "current_harvest": {
+            "crop": "Tomato",
+            "trust_score": 85,
+            "verification_method": "IoT_SENSOR_CONSENSUS",
+            "grade": "Grade B"
+        },
+        "farmer_reputation": {
+            "total_harvests_verified": 4,
+            "average_score": 88,
+            "score_history": [
+                {
+                    "date": "2024-06-15",
+                    "crop": "Wheat",
+                    "score": 90
+                },
+                {
+                    "date": "2024-02-20",
+                    "crop": "Onion",
+                    "score": 81
+                },
+                {
+                    "date": "2023-11-10",
+                    "crop": "Tomato",
+                    "score": 98
+                }
+            ]
+        },
+        "blockchain_hash": "0x97ad1f72935f8996974e9a79952be056e73942d47db47d686049a985edcb3c96",
+        "timestamp": "2025-12-25 16:39:40"
+    },
+    {
+        "certificate_id": "VY-724A0EDD",
+        "farm_node_id": "FARM-MH-NK-24A",
+        "current_harvest": {
+            "crop": "Tomato",
+            "trust_score": 65,
+            "verification_method": "IoT_SENSOR_CONSENSUS",
+            "grade": "Grade B"
+        },
+        "farmer_reputation": {
+            "total_harvests_verified": 4,
+            "average_score": 83,
+            "score_history": [
+                {
+                    "date": "2024-06-15",
+                    "crop": "Wheat",
+                    "score": 93
+                },
+                {
+                    "date": "2024-02-20",
+                    "crop": "Onion",
+                    "score": 84
+                },
+                {
+                    "date": "2023-11-10",
+                    "crop": "Tomato",
+                    "score": 93
+                }
+            ]
+        },
+        "blockchain_hash": "0x724a0eddd3d479c081504bc45be7e06b69b9efa49131fd493541d23805608774",
+        "timestamp": "2025-12-25 16:56:49"
+    },
+    {
+        "certificate_id": "VY-8C0A94A1",
+        "farm_node_id": "FARM-MH-NK-24A",
+        "current_harvest": {
+            "crop": "Tomato",
+            "trust_score": 95,
+            "verification_method": "IoT_SENSOR_CONSENSUS",
+            "grade": "Grade A"
+        },
+        "farmer_reputation": {
+            "total_harvests_verified": 4,
+            "average_score": 92,
+            "score_history": [
+                {
+                    "date": "2024-06-15",
+                    "crop": "Wheat",
+                    "score": 94
+                },
+                {
+                    "date": "2024-02-20",
+                    "crop": "Onion",
+                    "score": 88
+                },
+                {
+                    "date": "2023-11-10",
+                    "crop": "Tomato",
+                    "score": 93
+                }
+            ]
+        },
+        "blockchain_hash": "0x8c0a94a16fdf5ff57e1d8acdc19e4a232fa4d5fd0b913f229d30dcecd1068d82",
+        "timestamp": "2025-12-25 17:00:03"
+    }
+]
